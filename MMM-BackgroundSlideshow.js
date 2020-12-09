@@ -379,22 +379,35 @@ Module.register('MMM-BackgroundSlideshow', {
 
     const image = new Image();
     image.onload = () => {
-      // check if there are more than 2 elements and remove the first one
-      if (this.imagesDiv.childNodes.length > 1) {
-        this.imagesDiv.removeChild(this.imagesDiv.childNodes[0]);
-      }
+      let lastDiv = null;
+
       if (this.imagesDiv.childNodes.length > 0) {
-        this.imagesDiv.childNodes[0].style.opacity = '0';
+        lastDiv = this.imagesDiv.childNodes[0];
       }
 
       const transitionDiv = document.createElement('div');
       transitionDiv.className = 'transition';
+
+      // pick random transition
+      let transitionName;
+
       if (this.config.transitionImages && this.config.transitions.length > 0) {
-        let randomNumber = Math.floor(Math.random() * this.config.transitions.length);
+        const randomNumber = Math.floor(Math.random() * this.config.transitions.length);
+        transitionName = this.config.transitions[randomNumber]
+      }
+
+      if (transitionName) {
+        // remove last image after animation
+        if (lastDiv) {
+          transitionDiv.onanimationend = () => lastDiv.remove();
+        }
+
         transitionDiv.style.animationDuration = this.config.transitionSpeed;
-        transitionDiv.style.transition = `opacity ${this.config.transitionSpeed} ease-in-out`;
-        transitionDiv.style.animationName = this.config.transitions[randomNumber];
+        transitionDiv.style.animationName = transitionName;
         transitionDiv.style.animationTimingFunction = this.config.transitionTimingFunction;
+      } else if (lastDiv) {
+        // remove last image directly
+        lastDiv.remove();
       }
 
       const imageDiv = this.createDiv();
