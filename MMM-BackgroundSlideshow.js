@@ -381,6 +381,10 @@ Module.register('MMM-BackgroundSlideshow', {
     image.onload = () => {
       let lastDiv = null;
 
+      if (this.imagesDiv.childNodes.length > 1) {
+        this.imagesDiv.removeChild(this.imagesDiv.childNodes[0]);
+      }
+
       if (this.imagesDiv.childNodes.length > 0) {
         lastDiv = this.imagesDiv.childNodes[0];
       }
@@ -400,6 +404,7 @@ Module.register('MMM-BackgroundSlideshow', {
         // remove last image after animation
         if (lastDiv) {
           transitionDiv.onanimationend = () => lastDiv.remove();
+          transitionDiv.onanimationcancel = () => lastDiv.remove();
         }
 
         transitionDiv.style.animationDuration = this.config.transitionSpeed;
